@@ -175,7 +175,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"Authorization": "Bearer " + token
 						},
 					})
-					setStore({ auth: true });
+					if (response)  {
+						setStore({ auth: true });
+					}
 					return true;
 				} catch (error) {
 					console.log(error);
@@ -187,7 +189,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 			logout: async () => {
-				console.log("hola");
 				localStorage.removeItem("token");
 				setStore({ auth: false });
 			}
@@ -196,8 +197,3 @@ const getState = ({ getStore, getActions, setStore }) => {
 };
 
 export default getState;
-
-
-
-
-
