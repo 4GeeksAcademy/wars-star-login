@@ -33,10 +33,10 @@ export const Home = () => {
 				))},
 			</div>
 			<h1 className="text-danger d-flex justify-content-center my-3">Planets</h1>
-	
+
 			<div className="row d-flex justify-content-center">
 				{store.Planets.map((item, index) => (
-					
+
 					<Planets
 						name={item.name}
 						population={item.population}
@@ -52,19 +52,19 @@ export const Home = () => {
 
 			<div className="row d-flex justify-content-center">
 
-			{store.vehiculos.map((item, index) =>
-				
-				<Vehicles
-					name={item.name}
-					model={item.model}
-					passengers={item.passengers}
-					id={index + 1}
-				/>
-				
+				{store.vehiculos.map((item, index) =>
 
-			)}
+					<Vehicles
+						name={item.name}
+						model={item.model}
+						passengers={item.passengers}
+						id={index + 1}
+					/>
 
-</div>
+
+				)}
+
+			</div>
 
 
 		</div>

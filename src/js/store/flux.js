@@ -1,9 +1,10 @@
+const URL_BASE = "https://probable-fishstick-49wgx99xvpv3qqpg-3000.app.github.dev/";
+
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			details: [],
 			Planets: [],
-
 			favoritos: [],
 			demo: [
 				{
@@ -16,13 +17,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			], 
-
-			characters: []
-			,
-
+			],
+			auth: false,
+			characters: [],
 			vehiculos: []
-
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -57,11 +55,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					let response = await fetch("https://swapi.dev/api/people"); //especificamos la url donde vamos a buscar info
 					let data = await response.json()
 					console.log(data);
-					setStore({characters: data.results})
-					
+					setStore({ characters: data.results })
+
 				} catch (error) {
 					console.log(error)
-					
+
 				}
 			},
 			obtenerplanetas: async function () {
@@ -77,18 +75,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 			agregarFavorito: (name) => {
-				
-			
+
+
 				setStore({ favoritos: [...getStore().favoritos, name] });
-								
-					
-			
+
+
+
 			},
-			eliminarFavorito:(name)=>{
-				const arr= getStore().favoritos.filter((name2)=>
-				name2!==name)
-				setStore({ favoritos: arr});
-				
+			eliminarFavorito: (name) => {
+				const arr = getStore().favoritos.filter((name2) =>
+					name2 !== name)
+				setStore({ favoritos: arr });
+
 			},
 			getDetails: async (type, id) => {
 				/**
@@ -121,6 +119,77 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
+			},
+			singUp: async (email, password) => {
+				console.log(URL_BASE + "/singup");
+				console.log(email, password);
+				try {
+					let response = await fetch(URL_BASE + "/singup", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							email,
+							password,
+						}),
+					});
+					const data = await response.json();
+					console.log(data);
+					return true;
+				} catch (error) {
+					console.log(error);
+					return false;
+				}
+			},
+			login: async (email, password) => {
+				console.log(URL_BASE + "/login");
+				console.log(email, password);
+				try {
+					let response = await fetch(URL_BASE + "/login", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json"
+						},
+						body: JSON.stringify({
+							email,
+							password,
+						})
+					})
+					let data = await response.json();
+					localStorage.setItem("token", data.access_token);
+					setStore({ auth: true });
+					return true;
+				} catch (error) {
+					console.log(error);
+					return false;
+				}
+			},
+			validateToken: async () => {
+				let token = localStorage.getItem("token");
+
+				try {
+					let response = await fetch(URL_BASE + "/validate_token", {
+						method: "GET",
+						headers: {
+							"Authorization": "Bearer " + token
+						},
+					})
+					setStore({ auth: true });
+					return true;
+				} catch (error) {
+					console.log(error);
+					if (error.response.status > 400) {
+						setStore({ auth: false });
+						alert(error.response.data.msg);
+					}
+					return false;
+				}
+			},
+			logout: async () => {
+				console.log("hola");
+				localStorage.removeItem("token");
+				setStore({ auth: false });
 			}
 		}
 	};
