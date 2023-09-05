@@ -37,7 +37,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					});
 
 					let data = await response.json();
-					console.log(data.results);
 					setStore({ vehiculos: data.results });
 
 
@@ -54,7 +53,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					let response = await fetch("https://swapi.dev/api/people"); //especificamos la url donde vamos a buscar info
 					let data = await response.json()
-					console.log(data);
 					setStore({ characters: data.results })
 
 				} catch (error) {
@@ -68,7 +66,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					let response = await fetch("https://swapi.dev/api/planets"); //esto me regresa una respuesta, que la guerdo en un espacio de memoira
 					//le digo que espere por esa respuesta
 					let data = await response.json(); //le digo que convierta esa respuesta en un jason y lo guardo en un espacio de memoira y que espere por la convercion de esa respuesta
-					console.log(data);
 					setStore({ Planets: data.results }); //({propiedad:el valor que quiero actuaizar})
 				} catch (error) {
 					console.log(error);
@@ -121,8 +118,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ demo: demo });
 			},
 			singUp: async (email, password) => {
-				console.log(URL_BASE + "/singup");
-				console.log(email, password);
 				try {
 					let response = await fetch(URL_BASE + "/singup", {
 						method: "POST",
@@ -135,7 +130,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 						}),
 					});
 					const data = await response.json();
-					console.log(data);
 					return true;
 				} catch (error) {
 					console.log(error);
@@ -143,8 +137,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 			login: async (email, password) => {
-				console.log(URL_BASE + "/login");
-				console.log(email, password);
 				try {
 					let response = await fetch(URL_BASE + "/login", {
 						method: "POST",
@@ -166,7 +158,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 			validateToken: async () => {
-				let token = localStorage.getItem("token");
+				let token = localStorage.getItem("token") || "";
 
 				try {
 					let response = await fetch(URL_BASE + "/validate_token", {
@@ -175,22 +167,56 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"Authorization": "Bearer " + token
 						},
 					})
-					if (response)  {
+					if (token === "") {
+						return false;
+					}
+
+					if (response.msg == "Token has expired") {
+						return false;
+					}
+					if (response) {
 						setStore({ auth: true });
 					}
 					return true;
 				} catch (error) {
 					console.log(error);
 					if (error.response.status > 400) {
-						setStore({ auth: false });
 						alert(error.response.data.msg);
 					}
+					setStore({ auth: false });
+
 					return false;
 				}
 			},
 			logout: async () => {
 				localStorage.removeItem("token");
 				setStore({ auth: false });
+			},
+			getFavorites: async () => {
+				let token = localStorage.getItem("token");
+
+				try {
+					let response = await fetch(URL_BASE + "/user/favorites", {
+						method: "GET",
+						headers: {
+							"Authorization": "Bearer " + token
+						},
+					})
+
+					let data = await response.json();
+
+					setStore({ favoritos: data.results });
+
+					return true;
+				} catch (error) {
+					console.log(error);
+					if (error.response.status > 400) {
+						alert(error.response.data.msg);
+					}
+					setStore({ auth: false });
+
+					return false;
+				}
 			}
 		}
 	};

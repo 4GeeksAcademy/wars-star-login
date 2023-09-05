@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import "../../styles/home.css";
 import { Context } from "../store/appContext.js";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Planets from "../component/planets";
 import Vehicles from "../component/vehicles";
 import { Navbar } from "../component/navbar";
@@ -11,10 +11,20 @@ export const Home = () => {
 
 
 	const [state, setState] = useState({});
+
+	const navigate = useNavigate();
+
 	useEffect(() => {
+		const checking = async () => {
+			const res = await actions.validateToken();
+			console.log(res);
+			if (!res) navigate("/login");
+		}
+		checking();
 		actions.obtenerplanetas();
 		actions.obtenerPersonajes();
 		actions.obtenerVehiculosClaudia();
+
 	}, []);
 
 
